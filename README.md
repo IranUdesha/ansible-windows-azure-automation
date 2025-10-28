@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Ansible](https://img.shields.io/badge/Ansible-2.15%2B-red.svg)](https://www.ansible.com/)
+[![Ansible](https://img.shields.io/badge/Ansible-automation-blue?logo=ansible)](https://www.ansible.com/)
 [![Windows Server](https://img.shields.io/badge/Windows%20Server-2016%2B-blue.svg)](https://www.microsoft.com/en-us/windows-server/)
 [![Azure](https://img.shields.io/badge/Azure-Integrated-0078d4.svg)](https://azure.microsoft.com/)
 
