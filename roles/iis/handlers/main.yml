@@ -1,0 +1,12 @@
+---
+- name: Restart The Server
+  ansible.windows.win_reboot:
+    msg: "Reboot initiated by Ansible for changes to take effect"
+    pre_reboot_delay: 10
+    reboot_timeout: 600
+    post_reboot_delay: 60
+  
+- name: Restart IIS
+  ansible.windows.win_service:
+    name: W3SVC
+    state: restarted

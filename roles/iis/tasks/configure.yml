@@ -1,0 +1,102 @@
+---
+#Download maintenance Site from Storage Account
+- name: Download Maintenance Site from Storage Account
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ maintenance_site_file_name }}"
+    override: true
+
+- name: Artifact downloaded path
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ maintenance_site_file_name | replace('\\\\','/') }}"
+
+- name: Generate Target Path
+  set_fact:
+    target_path: "{{ artifact_path }}\\dep\\{{ (maintenance_site_file_name | replace('\\\\','/')) | dirname }}"
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+#Copy Setup to Target Location
+- name: Copy Setup File to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (maintenance_site_file_name ) | basename }}"
+    force: true
+
+#Unzip
+- name: Unzip Maintenance Site
+  win_unzip:
+    src: "{{ target_path }}\\{{ (maintenance_site_file_name ) | basename }}"
+    dest: "{{ site_folder_path }}"
+
+#Get SSL certificate hash
+- name: Get SSL Certificate Hash
+  win_shell: |
+    $cert = Get-ChildItem -Path Cert:\LocalMachine\My |
+      Where-Object { $_.Subject -like "*{{ ssl_certificate_name }}*" } |
+      Sort-Object NotAfter -Descending |
+      Select-Object -First 1
+    if ($null -eq $cert) {
+      throw "Certificate not found in LocalMachine\\My matching '{{ ssl_certificate_name }}'"
+    }
+    ($cert.Thumbprint -replace "\s", "")
+  register: ssl_cert_hash
+
+- name: debug ssl_cert_hash
+  debug:
+    var: ssl_cert_hash.stdout
+
+# Validate certificate thumbprint
+- name: Fail if SSL certificate not found
+  fail:
+    msg: "SSL certificate matching '{{ ssl_certificate_name }}' not found in LocalMachine\\My or thumbprint invalid."
+  when: (ssl_cert_hash.stdout | default('') | trim) | length == 0
+
+#Change Default website physical path in IIS
+- name: Change Default Website Physical Path
+  community.windows.win_iis_website:
+    name: "Default Web Site"
+    state: started
+    physical_path: "{{ site_folder_path }}\\maintenance"
+    application_pool: "DefaultAppPool"
+  notify: Restart IIS
+
+- name: Change Binding
+  community.windows.win_iis_webbinding :
+     name: "Default Web Site"
+     state: present
+     port: 80
+     ip: '*'
+     protocol: "http"
+     host_header: "{{ inventory_hostname }}.{{ certificate_domain }}"
+
+- name: Remove default HTTPS binding on 0.0.0.0:443 (no host header) if present
+  community.windows.win_iis_webbinding :
+     name: "Default Web Site"
+     state: absent
+     port: 443
+     ip: '*'
+     protocol: "https"
+
+- name: Remove existing HTTPS binding for this host header if present
+  community.windows.win_iis_webbinding :
+     name: "Default Web Site"
+     state: absent
+     port: 443
+     ip: '*'
+     protocol: "https"
+     host_header: "{{ inventory_hostname }}.{{ certificate_domain }}"
+
+- name: Add HTTPS Binding
+  community.windows.win_iis_webbinding :
+     name: "Default Web Site"
+     state: present
+     port: 443
+     ip: '*'
+     protocol: "https"
+     host_header: "{{ inventory_hostname }}.{{ certificate_domain }}"
+     certificate_hash: "{{ ssl_cert_hash.stdout | trim }}"
+     

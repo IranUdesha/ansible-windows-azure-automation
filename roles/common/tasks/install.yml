@@ -1,0 +1,35 @@
+---
+# Download Setup from Storage Account (reusable downloader)
+- import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ AZ_STG_File_name | replace('\\\\','/') }}"
+
+- name: Artifact downloaded path
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ AZ_STG_File_name | replace('\\\\','/') | trim }}"
+
+- name: Generate Target Path
+  set_fact:
+    target_path: "{{ artifact_path }}\\dep\\{{ (AZ_STG_File_name | replace('\\\\','/')) | dirname | trim }}"
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+#Copy Setup to Target Location
+- name: Copy Setup File to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (AZ_STG_File_name ) | basename }}"
+
+- name: Install {{ AZ_STG_File_name }} 
+  win_package:
+    path: "{{ target_path }}\\{{ (AZ_STG_File_name ) | basename }}"
+    state: present
+    arguments: "{{install_mode | default('/quiet') }}"
+  register: Result
+
+- name: Installation Result
+  debug:
+    var: Result

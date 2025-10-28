@@ -1,0 +1,9 @@
+---
+#Install Dotnet Hosting Bundles
+- name: Install .NET Hosting Bundles
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ item }}"
+    install_mode: "/quiet"
+  loop: "{{ dotnet_hosting_bundles }}"
+  when: dotnet_hosting_bundles is defined and dotnet_hosting_bundles | length > 0

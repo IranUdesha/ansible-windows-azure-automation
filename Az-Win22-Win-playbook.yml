@@ -1,0 +1,31 @@
+
+# Playbook to Configure windows Web Server
+
+- name: Configure windows Servers
+  hosts: win
+  gather_facts: no
+
+  roles:
+    # - role: ssl_cert # Download and Install SSL Certificate from Azure Key Vault 
+    - name: Download and Install SSL Certificate from Azure Key Vault
+      role: ssl_cert
+      when: 
+        - server_type is defined and server_type == 'web'
+        
+    - name: Install IIS and its required features, Modules and TLS Settings
+      role: iis
+      when: 
+        - server_type is defined and server_type == 'web'
+
+    - name: Install PHR Product Dependencies
+      role: dependencies # Install PHR Product Dependencies
+
+    - name: Install General Tools and Settings
+      role: general # Install Edge Browser, Sophos, Disable Firewall, Set Timezone, PowerShell Modules (This should be the last role)
+
+    - name: Remove Artifacts from Target Server
+      role: common  # Remove Artifacts from Target Server
+
+  
+
+

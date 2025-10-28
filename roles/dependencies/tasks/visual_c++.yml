@@ -1,0 +1,9 @@
+---
+#Install C++ Redistributables (loop through each file)
+- name: Install Visual C++ Redistributables
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ item }}"
+    install_mode: "/Q "
+  loop: "{{ VC_file_names }}"
+  when: VC_file_names is defined and VC_file_names | length > 0

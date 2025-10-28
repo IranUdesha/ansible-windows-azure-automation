@@ -1,0 +1,43 @@
+---
+- name: print debug message
+  debug:
+    msg: "Server Type - {{ server_type }}"
+
+# Install .NET Frameworks
+- name: Install .NET Frameworks
+  include_tasks: dotnet_frameworks.yml
+  when: install_dotnet_frameworks | default(true)
+
+# Install Access Engine
+- name: Install Access Engine
+  include_tasks: access_engine.yml
+  when: install_access_engine | default(true)
+
+  # Install Crystal Reports
+- name: Install Crystal Reports
+  include_tasks: crystal_report.yml
+  when: install_crystal_reports | default(true)
+
+# Install .Net Runtimes
+- name: Install .NET Runtimes
+  include_tasks: "{{ playbook_dir }}/roles/dependencies/tasks/dotnet_runtime.yml"
+  when: install_dotnet_runtimes | default(true)
+
+# Install Visual C++ 2010 Redistributable
+- name: Install Visual C++ 2010 Redistributables
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "Visual C++/vcredist2010_x64.exe"
+    install_mode: "/Q "
+
+ # Install .Net 3.5 Framework
+- name: Install .NET 3.5 Framework
+  become_method: runas
+  win_feature:
+    name:
+      - NET-Framework-Core
+    state: present
+
+
+
+

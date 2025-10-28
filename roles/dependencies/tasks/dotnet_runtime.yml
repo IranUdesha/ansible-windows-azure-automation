@@ -1,0 +1,9 @@
+---
+#Install Dotnet Runtimes
+- name: Install .NET Runtimes
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ item }}"
+    install_mode: "/quiet"
+  loop: "{{ dotnet_runtimes }}"
+  when: dotnet_runtimes is defined and dotnet_runtimes | length > 0

@@ -1,0 +1,25 @@
+# Ansible Vault Template for Sensitive Variables
+# Create your own vault.yml file based on this template
+# 
+# To create and encrypt the vault file:
+# ansible-vault create group_vars/win/vault.yml
+# 
+# To edit the encrypted vault file:
+# ansible-vault edit group_vars/win/vault.yml
+
+# Azure Service Principal Credentials
+azure_subscription_id: "your-azure-subscription-id"
+azure_tenant_id: "your-azure-tenant-id"
+azure_client_id: "your-azure-client-id"
+azure_client_secret: "your-azure-client-secret"
+
+# Azure Storage Account
+storage_account_key: "your-storage-account-key"
+
+# Windows Server Credentials
+windows_admin_password: "your-windows-admin-password"
+
+# Software License Keys
+crystal_reports_product_key: "your-crystal-reports-product-key"
+
+# Other sensitive values can be added here as needed

@@ -1,0 +1,125 @@
+---
+# Main IIS installation and configuration
+# This file orchestrates the entire IIS setup process
+
+
+- name: Ensure IIS Web-Server is installed
+  become_method: runas
+  win_feature:
+    name: Web-Server
+    state: present
+    include_management_tools: true
+  register: iis_installation
+  notify: Restart IIS
+
+- name: Print IIS Installation Status
+  debug:
+    msg: "IIS installation changed: {{ iis_installation.changed | default(false) }}"
+
+- name: Ensure IIS Common HTTP Features are installed
+  become_method: runas
+  win_feature:
+    name:
+      - Web-Common-Http
+      - Web-Default-Doc
+      - Web-Dir-Browsing
+      - Web-Http-Errors
+      - Web-Static-Content
+      - Web-Http-Redirect
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+- name: Ensure Health and Diagnostics Features are installed
+  become_method: runas
+  win_feature:
+    name:
+      - Web-Http-Logging
+      - Web-Request-Monitor
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+- name: Ensure Performance Features are installed
+  become_method: runas
+  win_feature:
+    name:
+      - Web-Stat-Compression
+      - Web-Dyn-Compression
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+- name: Ensure Security Features are installed
+  become_method: runas
+  win_feature:
+    name:
+      - Web-Basic-Auth
+      - Web-Windows-Auth
+      - Web-IP-Security
+      # - Web-Request-Filtering  # Installed with IIS by default
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+- name: Ensure Application Development Features are installed
+  become_method: runas
+  win_feature:
+    name:
+      - NET-Framework-Core
+      - NET-Framework-45-Core
+      - Web-ASP
+      - Web-ISAPI-Ext
+      - Web-ISAPI-Filter
+      - Web-Net-Ext45
+      - Web-Asp-Net45
+      - Web-Asp-Net
+    state: present
+  notify: Restart IIS
+
+
+- name: Ensure Management Tools are installed
+  become_method: runas
+  win_feature:
+    name:
+      - Web-Mgmt-Console
+      - Web-Mgmt-Service
+      - Web-Metabase
+      - Web-Scripting-Tools
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+- name: Ensure IIS service is running
+  win_service:
+    name: W3SVC
+    state: started
+
+- name: Ensure IIS Management Console is running
+  win_service:
+    name: WMSVC
+    state: started
+
+- name: Ensure Windows Identity Foundation is installed
+  become_method: runas
+  win_feature:
+    name: Windows-Identity-Foundation
+    state: present
+    include_sub_features: true
+  notify: Restart IIS
+
+
+- name: Install IIS modules
+  include_tasks: modules.yml
+  when: install_iis_modules | default(true)
+
+# Configure IIS settings
+- name: Configure IIS web server settings
+  include_tasks: configure.yml
+  when: configure_iis | default(true)
+
+# Apply TLS settings
+- name: Apply TLS settings
+  include_tasks: security.yml
+  when: harden_iis_security | default(true)
+

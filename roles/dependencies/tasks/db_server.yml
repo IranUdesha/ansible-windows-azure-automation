@@ -1,0 +1,10 @@
+---
+# Install .Net 3.1 Runtime
+- name: Install .NET 3.1 Runtime
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: ".NET Core 3.1 Runtime/dotnet-runtime-3.1.32-win-x64.exe"
+    install_mode: "/quiet"
+
+# Create a SQL user
+    

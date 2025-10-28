@@ -1,0 +1,140 @@
+# Ansible specific files
+*.retry
+*.log
+.vault_pass
+.vault_password
+vault_password
+vault_pass
+
+# Ansible Galaxy dependencies
+.galaxy_install_info
+
+# Ansible collections cache
+ansible_collections/
+
+# Ansible facts cache
+.fact_cache/
+fact_cache/
+
+# Ansible inventory cache
+.inventory_cache
+
+# Ansible temporary files
+.ansible/
+.ansible_async/
+
+# Dynamic inventory scripts output
+hosts.cache
+inventory.cache
+
+# Ansible Vault files (if they contain sensitive data)
+# Uncomment these if you want to ignore vault files entirely
+# vault.yml
+# **/vault.yml
+# secrets.yml
+# **/secrets.yml
+
+# SSH keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+
+# Azure credentials and secrets
+azure_credentials
+.azure/
+azure.json
+service_principal.json
+
+# AWS credentials
+.aws/
+aws_credentials
+
+# GCP credentials
+.gcp/
+gcp_credentials.json
+service_account.json
+
+# Terraform files (if used with Ansible)
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+
+# Environment files
+.env
+.env.local
+.env.*.local
+environment.yml
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+
+# Python related (if using Python scripts with Ansible)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+.tmp/
+
+# Backup files
+*.bak
+*.backup
+backup/
+backups/
+
+# Documentation build
+docs/_build/
+site/

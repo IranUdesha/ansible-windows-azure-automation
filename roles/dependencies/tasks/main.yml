@@ -1,0 +1,25 @@
+---
+- name: Ensure dependency directory exists
+  win_file:
+    path: "{{ artifact_path }}\\dep"
+    state: directory
+
+
+# Web server specific dependencies
+- name: Install web server dependencies
+  include_tasks: web_server.yml
+  when: 
+    - "server_type is defined and server_type == 'web'"
+
+# Database server specific dependencies
+- name: Install database server dependencies
+  include_tasks: db_server.yml
+  when: 
+    - "server_type is defined and server_type == 'db'"
+
+# Job server specific dependencies
+- name: Install job server dependencies
+  include_tasks: job_server.yml
+  when: 
+    - "server_type is defined and server_type == 'job'" 
+  

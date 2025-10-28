@@ -1,0 +1,35 @@
+---
+# Install PDF Converter 0.9.9
+- name: Install PDF Converter 0.9.9
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ PDF_Converter_file_name }}"
+    install_mode: "/S"
+
+# Install PDF Converter V9
+- name: Install PDF Converter V9
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ PDF_Converter_V9_file_name | replace('\\\\','/') | trim }}"
+  
+- name: Set source and target paths for PDF Converter V9
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ PDF_Converter_V9_file_name | replace('\\\\','/') | trim }}"
+    target_path: "{{ artifact_path }}\\dep\\{{ (PDF_Converter_V9_file_name | replace('\\\\','/')) | dirname | trim }}"
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+#Copy Setup to Target Location
+- name: Copy Setup File to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (PDF_Converter_V9_file_name ) | basename }}"
+
+#Unzip PDF Converter V9
+- name: Unzip PDF Converter V9 to {{PDF_Converter_V9_Target_path}}
+  win_unzip:
+    src: "{{ target_path }}\\{{ (PDF_Converter_V9_file_name ) | basename }}"
+    dest: "{{ PDF_Converter_V9_Target_path }}"

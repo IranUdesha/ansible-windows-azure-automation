@@ -1,0 +1,27 @@
+# Python Requirements for Ansible Windows Azure Automation
+# Install with: pip install -r requirements.txt
+
+# Core Ansible dependencies
+ansible>=2.15.0,<3.0.0
+ansible-core>=2.15.0,<3.0.0
+
+# Windows Remote Management
+pywinrm>=0.4.3
+requests>=2.28.0
+requests-ntlm>=1.1.0
+
+# Azure integration
+azure-cli>=2.50.0
+azure-identity>=1.13.0
+azure-mgmt-keyvault>=10.0.0
+azure-mgmt-storage>=21.0.0
+azure-storage-blob>=12.0.0
+
+# Security and encryption
+cryptography>=3.4.8
+pynacl>=1.5.0
+
+# Utilities
+pyyaml>=6.0
+jinja2>=3.0.0
+packaging>=21.0

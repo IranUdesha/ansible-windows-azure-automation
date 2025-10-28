@@ -1,0 +1,78 @@
+---
+#Install ASP AJAX
+- name: Install ASP.NET AJAX
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ AJAX_file_name }}"
+    install_mode: "/quiet"
+
+# Install Access Engine
+- name: Install Access Engine
+  include_tasks: access_engine.yml
+  when: install_access_engine | default(true)
+
+# Install MS Chart
+- name: Install MS Chart
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ MS_Chart_file_name }}"
+    install_mode: "/quiet"
+
+# Install PDF Converter
+- name: Install PDF Converter
+  include_tasks: pdf_converter.yml
+  when: install_pdf_converter | default(true)
+
+# Install eWorld
+- name: Install eWorld
+  include_tasks: eworld.yml
+  when: install_eworld | default(true)
+
+# Install Visual C++ Redistributables
+- name: Install Visual C++ Redistributables
+  include_tasks: visual_c++.yml
+  when: install_visual_c | default(true)
+
+# Install Crystal Reports
+- name: Install Crystal Reports
+  include_tasks: crystal_report.yml
+  when: install_crystal_reports | default(true)
+
+# Install .NET Hosting Bundles
+- name: Install .NET Hosting Bundles
+  include_tasks: dotnet_hosting_bundles.yml
+  when: install_dotnet_hosting_bundles | default(true)
+
+# Install .NET Frameworks
+- name: Install .NET Frameworks
+  include_tasks: dotnet_frameworks.yml
+  when: install_dotnet_frameworks | default(true)
+
+# Create a Folder for Temp Image Files
+- name: Ensure Temp Image Directory Exists in Target on C
+  win_file:
+    path: "C:\\TempImageFiles"
+    state: directory
+
+# Grant IIS_IUSRS Full Control to TempImageFiles
+- name: Grant IIS_IUSRS Full Control to TempImageFiles
+  win_acl:
+    path: "C:\\TempImageFiles"
+    user: "IIS_IUSRS"
+    rights: FullControl
+    type: allow
+    state: present
+    inherit: ContainerInherit,ObjectInherit
+    propagation: None
+
+- name: Verify TempImageFiles permissions
+  win_shell: |
+    $acl = Get-Acl "C:\TempImageFiles"
+    $acl.Access | Where-Object { $_.IdentityReference -like "*IIS_IUSRS*" } | Select-Object IdentityReference, FileSystemRights, AccessControlType
+  register: tempimage_permissions
+
+- name: Display TempImageFiles permissions
+  debug:
+    msg: "TempImageFiles permissions for IIS_IUSRS: {{ tempimage_permissions.stdout_lines }}"
+    
+

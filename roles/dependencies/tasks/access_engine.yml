@@ -1,0 +1,13 @@
+---
+# Install Database Engine 2010
+- name: Install Database Engine 2010
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ Access_Engine_2010_file_name }}" 
+    install_mode: "/quiet"
+# Install Database Engine 2007
+- name: Install Database Engine 2007
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ Access_Engine_2007_file_name }}" 
+    install_mode: "/quiet"

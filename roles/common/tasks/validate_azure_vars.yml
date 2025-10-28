@@ -1,0 +1,26 @@
+---
+# Validates required Azure variables before roles run.
+# Include from a play or role with:
+# - include_role:
+#     name: common
+#     tasks_from: validate_azure_vars
+
+- name: Validate Azure subscription id is set
+  assert:
+    that:
+      - azure_subscription_id is defined
+      - (azure_subscription_id | string) | length > 0
+    fail_msg: "azure_subscription_id is required. Set it in group_vars/ubuntu/azure.yml"
+    success_msg: "azure_subscription_id is set."
+  # no_log: true  # avoid leaking in output
+
+- name: Validate Azure Service Principal variables when not using MSI
+  assert:
+    that:
+      - azure_use_msi | default(false) | bool == false or (azure_use_msi | default(false) | bool == true)
+      - (azure_use_msi | default(false) | bool) or (azure_tenant_id is defined and (azure_tenant_id | string) | length > 0)
+      - (azure_use_msi | default(false) | bool) or (azure_client_id is defined and (azure_client_id | string) | length > 0)
+      - (azure_use_msi | default(false) | bool) or (azure_client_secret is defined and (azure_client_secret | string) | length > 0)
+    fail_msg: "Service Principal vars (azure_tenant_id, azure_client_id, azure_client_secret) are required when azure_use_msi=false. Store secrets in group_vars/ubuntu/vault.yml"
+    success_msg: "Azure auth variables are set."
+  # no_log: true  # avoid leaking secrets in output

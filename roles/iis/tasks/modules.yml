@@ -1,0 +1,41 @@
+---
+# IIS Prerequisites installation tasks
+
+ # Install URL Rewrite Module
+- name: Install URL Rewrite Module
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ URL_Rewrite_file_name }}"
+    install_mode: "/quiet"
+  
+  notify: Restart IIS
+
+# Install Application Request Routing (ARR) Module
+- name: Install Application Request Routing (ARR) Module
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: " {{ ARR_file_name }}"
+    install_mode: "/quiet"
+  notify: Restart IIS
+
+#Enable Application Request Routing
+- name: Enable Application Request Routing
+  win_shell: |
+    Import-Module WebAdministration
+
+    # Enable Proxy in Application Request Routing
+    Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/proxy" -name "enabled" -value "True"
+
+    # Set the time-out value for the proxy to 120 seconds (default is 30 seconds)
+    # Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/proxy" -name "timeout" -value "00:02:00"
+
+    # Optionally, you can set other properties as needed
+    # For example, to enable SSL offloading:
+    # Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.webServer/proxy" -name "sslOffloading" -value "True"
+
+    # Restart IIS to apply changes
+    iisreset
+  args:
+    executable: powershell.exe
+  register: arr_enable
+  notify: Restart IIS

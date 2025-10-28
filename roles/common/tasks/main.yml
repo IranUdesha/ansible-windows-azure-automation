@@ -1,0 +1,6 @@
+---
+- name: Remove Artifact path on The Target Server
+  win_file:
+    path: "{{ artifact_path }}"
+    state: absent
+  notify: Restart The Server

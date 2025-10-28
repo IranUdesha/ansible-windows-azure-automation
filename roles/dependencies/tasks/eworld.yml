@@ -1,0 +1,42 @@
+---
+#Check if Ecentrics World Controls is Installed
+- name: Check if Ecentrics World Controls is Installed
+  win_shell: |
+    # Check registry for installed programs (faster than Win32_Product)
+    $uninstallKeys = @(
+        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
+        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    )
+    
+    $found = $false
+    foreach ($key in $uninstallKeys) {
+        $apps = Get-ItemProperty $key -ErrorAction SilentlyContinue | Where-Object { 
+            $_.DisplayName -like "*Ecentrics*" -or 
+            $_.DisplayName -like "*eWorld*" -or 
+            $_.DisplayName -like "*Excentrics World Controls*"
+        }
+        if ($apps) {
+            $found = $true
+            Write-Output "Found: $($apps.DisplayName -join ', ')"
+            break
+        }
+    }
+    
+    if ($found) {
+        Write-Output "Installed"
+    } else {
+        Write-Output "Not Installed"
+    }
+  register: eworld_check
+
+- name: Display eWorld installation status
+  debug:
+    msg: "Ecentrics World Controls status: {{ eworld_check.stdout_lines | join(' ') }}"
+
+#Install eWorld only if not already installed
+- name: Install eWorld
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ eWorld_file_name }}"
+    install_mode: "/S"
+  when: "'Not Installed' in eworld_check.stdout"

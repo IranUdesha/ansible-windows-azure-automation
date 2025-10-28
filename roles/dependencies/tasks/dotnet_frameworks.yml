@@ -1,0 +1,9 @@
+---
+#Install .Net Frameworks
+- name: Install .NET Frameworks
+  include_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ item }}"
+    install_mode: "/q"
+  loop: "{{ dotnet_frameworks }}"
+  when: dotnet_frameworks is defined and dotnet_frameworks | length > 0

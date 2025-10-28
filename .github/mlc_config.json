@@ -1,0 +1,35 @@
+{
+  "alive-status-codes": [200, 206],
+  "check-modified-files-only": false,
+  "base-url": "",
+  "file-extension": [".md"],
+  "file-path": "./README.md",
+  "httpHeaders": [
+    {
+      "urls": ["https://github.com/"],
+      "headers": {
+        "Accept": "application/vnd.github.v3+json"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://your-"
+    },
+    {
+      "pattern": "^#"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "{{BASEURL}}/"
+    }
+  ],
+  "retryOn429": true,
+  "retryCount": 3,
+  "fallbackHttpStatus": [400, 401, 403, 404, 500, 502, 503, 504]
+}

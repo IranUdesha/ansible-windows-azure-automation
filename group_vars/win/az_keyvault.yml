@@ -1,0 +1,12 @@
+---
+# ENCRYPT THIS FILE WITH ANSIBLE VAULT
+# ansible-vault encrypt group_vars/ubuntu/vault.yml
+# Or: ansible-vault edit group_vars/ubuntu/vault.yml
+
+key_vault_uri: "https://hbiz-cloud.vault.azure.net/"
+
+# SSL certificate Details
+ssl_certificate_name: "phrsandbox"
+certificate_domain: "phrsandbox.dev"
+ssl_certificate_password: "" # if your pfx is not password protected leave it blank
+

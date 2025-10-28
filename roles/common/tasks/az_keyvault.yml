@@ -1,0 +1,31 @@
+---
+
+    # Retrieve secret from Azure Key Vault (azure collection) and this task work on Ansible controller
+  - name: Retrieve secret from Azure Key Vault (azure collection)
+    azure.azcollection.azure_rm_keyvaultsecret:
+      secret_name: "{{ ssl_certificate_name }}"
+      keyvault_uri: "{{ key_vault_uri }}"
+      client_id: "{{ azure_client_id }}"
+      secret: "{{ azure_client_secret }}"
+      tenant: "{{ azure_tenant_id }}"
+      subscription_id: "{{ azure_subscription_id | default(omit) }}"
+      auth_source: auto
+      state: present
+      
+    register: keyvault_secret
+    delegate_to: localhost
+    vars:
+      ansible_python_interpreter: /usr/bin/python3
+
+  # - name: Check the Key Vault secret
+  #   debug:
+  #     msg: "Key Vault secret {{ keyvault_secret.state.secret_value }}"
+
+
+  - name: Write secret to a file
+    copy:
+      content: "{{ keyvault_secret.state.secret_value }}"
+      dest: "{{ temp_location }}/{{ ssl_certificate_name }}.pfx"
+      mode: '0600'
+
+    delegate_to: localhost

@@ -1,0 +1,74 @@
+---
+#Azure Storage account
+stg_resource_group: "dependencies"
+container: "win-dependencies"
+account_name: "stgdependencies"
+account_key: "{{ storage_account_key }}"  # Replace with your actual storage account key or use Azure Key Vault
+
+#TLS Configuration
+IIS_Crypto_file_name: "IISCrypto/IISCryptoCli.exe"
+Crypto_template_file_name: "IISCrypto/TLS_Protocols.ictpl"
+
+#Azure CLI
+AZ_CLI_File_name: "azure-cli/azure-cli-2.76.0-x64.msi"
+#Sophos
+Sophos_file_name: "sophos/SophosSetup.exe"
+#Edge Browser
+Edge_file_name: "Edge Browser/MicrosoftEdgeEnterpriseX64.msi"
+#Notepad ++
+Notepad_link: "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.4.8/npp.8.4.8.Installer.x64.exe"
+#AJEX
+AJAX_file_name: "ASPAJAXExtSetup/ASPAJAXExtSetup.msi"
+#Access Database Engine 2010
+Access_Engine_2010_file_name: "AccessDatabaseEngine2010/AccessDatabaseEngine.exe"
+#Access Database Engine 2007
+Access_Engine_2007_file_name: "AccessDatabaseEngine/AccessDatabaseEngine.exe"
+#MS Chart
+MS_Chart_file_name: "MSChart/MSChart.exe"
+#PDF Converter 0.9.9
+PDF_Converter_file_name: "PDFConvertor/wkhtmltopdf-0.9.9-installer.exe"
+#PDF Converter V9
+PDF_Converter_V9_file_name: "wkhtmltopdfV9/wkhtmltopdfV9.zip"
+PDF_Converter_V9_Target_path: "C:\\Program Files (x86)\\wkhtmltopdfV9"
+
+#Eworld 1.9
+eWorld_file_name: "eWorld/eWorldInstall.exe"
+#Visual C++
+VC_file_names:
+  - "Visual C++/vcredist2005_x64.exe"
+  - "Visual C++/vcredist2008_x64.exe"
+  - "Visual C++/vcredist2010_x64.exe"
+  - "Visual C++/vcredist2012_x64.exe"
+  - "Visual C++/vcredist2013_x64.exe"
+  - "Visual C++/vcredist2015_2017_2019_2022_x64.exe"
+
+#Crystal Report
+CR1332bit_runtime_file_name: "Crystal_13_0_2/CRRuntime_32bit_13_0_2.msi"
+CR1364bit_runtime_file_name: "Crystal_13_SP36/CR13SP36MSI64_0-80007712.MSI"
+CRXI_DeveloperSP4_file_name: "CR_XI_Developer_SP4/CR_XI_Developer_SP4.zip"
+CRXI_DeveloperSP4_PKEY: "{{ crystal_reports_product_key }}"  # Replace with your Crystal Reports product key
+#Dotnet Hosting Bundles
+dotnet_hosting_bundles:
+  - ".NET Core 3.1 Hosting Bundle/dotnet-hosting-3.1.32-win.exe"
+  - ".NET Core 6.0 Hosting Bundle/dotnet-hosting-6.0.28-win.exe"
+  - ".NET Core 8.0 Hosting Bundle/dotnet-hosting-8.0.3-win.exe"
+
+#.Net Frameworks
+dotnet_frameworks:
+    - ".NET Framework 4.8/ndp48-x86-x64-allos-enu.exe"
+# .Net Runtimes
+dotnet_runtimes:
+  - ".NET Core 3.1 Runtime/dotnet-runtime-3.1.32-win-x64.exe"
+  - ".NET Core 6.0 Runtime/dotnet-runtime-6.0.28-win-x64.exe"
+  - ".NET Core 8.0 Runtime/dotnet-runtime-8.0.3-win-x64.exe"
+
+
+#URL Rewrite Module
+URL_Rewrite_file_name: "URL_Rewrite/rewrite_amd64_en-US.msi"
+#Application Request Routing
+ARR_file_name: "Application Request Routing/requestRouter_amd64.msi"
+
+
+#Maintenance Site
+maintenance_site_file_name: "Maintenance/maintenance.zip"
+site_folder_path: "C:\\inetpub\\wwwroot\\"

@@ -1,0 +1,77 @@
+---
+# download IIS Crypto Setup from storage account
+- import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ IIS_Crypto_file_name }}"
+    override: true
+
+- name: Artifact downloaded path (IIS Crypto)
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ IIS_Crypto_file_name | replace('\\\\','/') }}"
+
+- name: Generate Target Path (IIS Crypto)
+  set_fact:
+    target_path: "{{ artifact_path }}\\dep\\{{ (IIS_Crypto_file_name | replace('\\\\','/')) | dirname }}"
+
+- name: Ensure artifact base directory exists on Target
+  win_file:
+    path: "{{ artifact_path }}\\dep"
+    state: directory
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+# Copy Setup to Target Location
+- name: Copy IIS Crypto to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (IIS_Crypto_file_name ) | basename }}"
+    force: true
+
+
+# Download Crypto Template
+- import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ Crypto_template_file_name }}"
+    override: true
+
+- name: Artifact downloaded path (Template)
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ Crypto_template_file_name | replace('\\\\','/') }}"
+
+- name: Generate Target Path (Template)
+  set_fact:
+    target_path: "{{ artifact_path }}\\dep\\{{ (Crypto_template_file_name | replace('\\\\','/')) | dirname }}"
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+# Copy Template to Target Location
+- name: Copy IIS Crypto Template to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (Crypto_template_file_name ) | basename }}"
+    force: true
+
+
+# Verify files exist and import TLS Protocols using IIS Crypto
+- name: Resolve IIS Crypto executable path on target
+  set_fact:
+    iis_crypto_exe: "{{ artifact_path }}\\dep\\{{ (IIS_Crypto_file_name | replace('\\\\','/'))}}"
+
+- name: Resolve IIS Crypto template path on target
+  set_fact:
+    iis_crypto_tpl: "{{ artifact_path }}\\dep\\{{ (Crypto_template_file_name | replace('\\\\','/'))  }}"
+
+- name: Set TLS Protocols using IIS Crypto
+  win_command: >
+    "{{ iis_crypto_exe }}" /template "{{ iis_crypto_tpl }}"
+  register: iis_crypto_result
+  # notify: Restart The Server
+
+
+

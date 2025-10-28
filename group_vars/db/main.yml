@@ -1,0 +1,6 @@
+--- 
+#Ansible controller
+temp_location: "/tmp/ansible"
+
+#Target
+artifact_path: "C:\\phr-artifacts"

@@ -1,0 +1,61 @@
+---
+#Install Crystal Report Runtime 32bit
+- name: Install Crystal Report Runtime 32bit
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ CR1332bit_runtime_file_name }}"
+    install_mode: "/qn /norestart"
+
+#Install Crystal Report Runtime 64bit
+- name: Install Crystal Report Runtime 64bit
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ CR1364bit_runtime_file_name }}"
+    install_mode: "/qn /norestart"
+
+# #Manual Install Crystal Report XI Developer SP4
+- name: Download Crystal Report XI Developer SP4
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/az_storage.yml"
+  vars:
+    blob_path: "{{ CRXI_DeveloperSP4_file_name | replace('\\\\','/') }}"
+
+- name: Artifact downloaded path
+  set_fact:
+    src_path: "{{ temp_location }}/dep/{{ CRXI_DeveloperSP4_file_name | replace('\\\\','/') }}"
+
+- name: Generate Target Path
+  set_fact:
+    target_path: "{{ artifact_path }}\\dep\\{{ (CRXI_DeveloperSP4_file_name | replace('\\\\','/')) | dirname }}"
+
+- name: Ensure {{ target_path }} Directory Exists in Target
+  win_file:
+    path: "{{ target_path }}"
+    state: directory
+
+#Copy Setup to Target Location
+- name: Copy Setup File to Target 
+  win_copy:
+    src: "{{ src_path }}"
+    dest: "{{ target_path }}\\{{ (CRXI_DeveloperSP4_file_name ) | basename }}"
+
+#Unzip
+- name: Unzip {{ CRXI_DeveloperSP4_file_name }}
+  win_unzip:
+    src: "{{ target_path }}\\{{ (CRXI_DeveloperSP4_file_name ) | basename }}"
+    dest: "{{ target_path }}\\setup"
+
+
+- name: Install {{ CRXI_DeveloperSP4_file_name }} 
+  win_package:
+    path: "{{ target_path }}\\setup\\setup.exe"
+    state: present
+    arguments: "ADDLOCAL=ALL CLIENTLANGUAGE=EN REBOOT=ReallySuppress PIDKEY={{ CRXI_DeveloperSP4_PKEY }} /qn"
+  register: Result
+
+- name: Installation Result
+  debug:
+    var: Result
+
+
+
+

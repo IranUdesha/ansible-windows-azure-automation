@@ -1,0 +1,69 @@
+---
+# Reusable artifact download task
+# Inputs (provide via vars when importing):
+#   blob_path: path inside container e.g. "Az-CLI/azure-cli-2.76.0-x64.msi" OR legacy file_name
+#   container: storage container name
+#   account_name: storage account name
+#   stg_resource_group: resource group (needed for SP auth)
+#   subscription_id, azure_client_id, azure_client_secret, azure_tenant_id (for SP auth) OR account_key (for key auth)
+#   temp_location: base temp directory on controller (default already defined globally)
+# Optional:
+#   download_root: override base root instead of temp_location
+
+- name: Normalize blob path variable (support legacy file_name)
+  set_fact:
+    _raw_blob: "{{ (blob_path | default(file_name)) | trim }}"
+  delegate_to: localhost
+
+- name: Normalize slashes in blob path
+  set_fact:
+    normalized_blob: "{{ _raw_blob | replace('\\\\','/') }}"
+  delegate_to: localhost
+
+- name: Compute destination path
+  set_fact:
+    dest_path: "{{ (download_root | default(temp_location)) }}/dep/{{ normalized_blob }}"
+  delegate_to: localhost
+
+- name: Ensure Download path {{ dest_path | dirname }} exists and has correct permissions
+  become: yes
+  file:
+    path: "{{ dest_path | dirname }}"
+    state: directory
+    mode: '7777'
+    recurse: true
+    owner: azureuser
+    group: azureuser
+  delegate_to: localhost
+
+
+- name: Download {{ normalized_blob }} artifact from Azure Storage
+  become: yes
+  azure.azcollection.azure_rm_storageblob:
+    client_id: "{{ azure_client_id | default(omit) }}"
+    secret: "{{ azure_client_secret | default(omit) }}"
+    tenant: "{{ azure_tenant_id | default(omit) }}"
+    subscription_id: "{{ azure_subscription_id | default(omit) }}"
+
+    container: "{{ container }}"
+    blob: "{{ normalized_blob }}"
+    dest: "{{ dest_path }}"
+    account_name: "{{ account_name }}"
+    resource_group: "{{ stg_resource_group | default(omit) }}"
+    state: present
+    force: "{{ override | default(false) }}"
+
+
+  delegate_to: localhost
+  register: download_result
+
+
+- name: Download Result
+  debug:
+    msg: 
+    - "Downloaded {{ normalized_blob }} to {{ dest_path }}"
+    - "Result - {{ download_result }}"
+  delegate_to: localhost
+
+
+

@@ -1,0 +1,118 @@
+---
+# Install Telnet Client
+- name: Ensure to Install Telnet
+  win_feature:
+    name: Telnet-Client
+    state: present
+  
+ # Install Azure CLI
+- name: Install Azure CLI
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ AZ_CLI_File_name }}"
+    install_mode: "/quiet"
+
+# Install Notepad++
+- name: download latest notepad++
+  win_get_url:
+    url: "{{ Notepad_link }}"
+    dest: "{{artifact_path}}\\{{Notepad_link | basename }}"
+  register: notepad_download_result
+
+- name: Install Notepad++
+  win_package:
+    path: "{{artifact_path}}\\{{Notepad_link | basename }}"
+    state: present
+    arguments: '/S'  # Silent installation
+  when: notepad_download_result is succeeded
+
+
+#Check if Edge Browser is Installed
+- name: Check if Microsoft Edge is Installed
+  win_shell: |
+    # Check registry for installed programs (faster than Win32_Product)
+    $uninstallKeys = @(
+        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
+        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    )
+    
+    $found = $false
+    foreach ($key in $uninstallKeys) {
+        $apps = Get-ItemProperty $key -ErrorAction SilentlyContinue | Where-Object { 
+            $_.DisplayName -like "*Microsoft Edge*" -or 
+            $_.DisplayName -like "*Edge*"
+        }
+        if ($apps) {
+            $found = $true
+            Write-Output "Found: $($apps.DisplayName -join ', ')"
+            break
+        }
+    }
+    
+    if ($found) {
+        Write-Output "Installed"
+    } else {
+        Write-Output "Not Installed"
+    }
+  register: edge_check
+
+- name: Display Edge Install Status
+  debug:
+    msg: "Microsoft Edge status: {{ edge_check.stdout_lines | join(' ') }}"
+
+
+#Install Edge Browser
+- name: Install Microsoft Edge Browser
+  import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ Edge_file_name }}"
+    install_mode: "/quiet"
+  when: "'Not Installed' in edge_check.stdout"
+
+# Disable Windows Firewall
+- name: Disable Windows Firewall in Windows server
+  ansible.windows.win_firewall:
+    state: disabled
+
+#Change Time Zone
+- name: Set Time Zone to Sri Lanka Standard Time
+  win_timezone:
+    timezone: "Sri Lanka Standard Time"
+    
+# Install Sophos
+- name: Check if Sophos is already installed
+  win_service:
+    name: "Sophos Endpoint Defense Service"  # or appropriate Sophos service name
+  register: check_sophos
+
+#Install Sophos Antivirus
+- import_tasks: "{{ playbook_dir }}/roles/common/tasks/install.yml"
+  vars:
+    AZ_STG_File_name: "{{ Sophos_file_name }}"
+    install_mode: "--quiet"
+  when: check_sophos.exists is not defined or not check_sophos.exists
+
+
+# Install Powershell Modules on Target
+  #Install Nuget Provider
+- name: Install Nuget Provider
+  win_shell: |
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+  args:
+    executable: PowerShell
+
+  #Install SqlServer PowerShell Module
+- name: Install SqlServer PowerShell Module
+  win_shell: |
+    Install-Module -Name SqlServer -AllowClobber -Force -Scope AllUsers
+  args:
+    executable: PowerShell
+  register: sql_module_install
+
+- name: Verify SqlServer PowerShell Module installation
+  win_shell: |
+    Get-Module -Name SqlServer -ListAvailable
+  args:
+    executable: PowerShell
+  register: sql_module_verify
+

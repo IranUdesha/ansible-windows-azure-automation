@@ -1,0 +1,55 @@
+---
+- name: validate Azure credentials
+  include_role:
+    name: common
+    tasks_from: validate_azure_vars
+  # Check if the Certificate directory exists, if not create it
+- name: Ensure certificate directory exists
+  file:
+    path: "{{ temp_location }}"
+    state: directory
+  delegate_to: localhost
+
+# Download SSL Certificate from Azure Key Vault
+- name: Download SSL Certificate from Azure Key Vault
+  include_role:
+    name: common
+    tasks_from: az_keyvault
+
+
+- name: Ensure the destination directory exists on Target
+  win_file:
+      path: "{{ artifact_path }}\\certs"
+      state: directory
+
+
+- name: Copy certificate artifact to Windows host
+  win_copy:
+    src: "{{ temp_location }}/{{ ssl_certificate_name }}.pfx"
+    dest: "{{ artifact_path }}\\certs\\{{ ssl_certificate_name }}.pfx"
+
+
+- name: Import SSL certificate from PFX file
+  win_shell: |
+    # $pwd = ConvertTo-SecureString {{ ssl_certificate_password }} -AsPlainText -Force   # if your pfx is not password protected 
+    Import-PfxCertificate -FilePath '{{ artifact_path }}\\certs\\{{ ssl_certificate_name }}.pfx' -CertStoreLocation Cert:\LocalMachine\My # -Password $pwd
+    
+  register: certificate_import_result
+
+
+- name: SSL Certificate Import Result
+  debug:
+    var: certificate_import_result.stdout_lines
+
+- name: Clear Up temporary Files on Target
+  win_file:
+    path: "{{ artifact_path }}\\certs\\{{ ssl_certificate_name }}.pfx"
+    state: absent
+  register: cleanup_result
+
+- name: CleanUp Result on Server
+  debug:
+    var: cleanup_result
+
+
+  
