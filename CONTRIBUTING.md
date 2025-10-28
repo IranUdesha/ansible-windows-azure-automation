@@ -191,7 +191,7 @@ All contributions must include appropriate testing:
 
 ```bash
 # Required: All playbooks must pass syntax check
-ansible-playbook --syntax-check Az-Win22-Win-playbook.yml
+ansible-playbook --syntax-check playbook.yml
 ```
 
 #### 2. Linting
@@ -207,13 +207,13 @@ yamllint .
 #### 3. Functional Testing
 
 ```bash
-# Recommended: Test in development environment
-ansible-playbook -i inventory/dev-hosts.ini Az-Win22-Win-playbook.yml \
+# Test in development environment
+ansible-playbook -i inventory/dev-hosts.ini playbook.yml \
   -e "server_type=web" --check
 
 # Test with different server types
 for server_type in web job db; do
-  ansible-playbook -i inventory/dev-hosts.ini Az-Win22-Win-playbook.yml \
+  ansible-playbook -i inventory/dev-hosts.ini playbook.yml \
     -e "server_type=$server_type" --check
 done
 ```
@@ -309,7 +309,7 @@ Each role should include:
    
    # Test locally
    ansible-lint .
-   ansible-playbook --syntax-check Az-Win22-Win-playbook.yml
+   ansible-playbook --syntax-check playbook.yml
    ```
 
 4. **Commit with clear messages**

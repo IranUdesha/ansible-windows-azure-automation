@@ -346,31 +346,35 @@ db-server-01 ansible_host=10.0.1.30 ansible_user=admin ansible_password='SecureP
 ### **Quick Start**
 
 1. **Test Connectivity**
+
 ```bash
 # Test connection to all Windows servers
 ansible all -i inventory/hosts.ini -m ansible.windows.win_ping --ask-vault-pass
 ```
 
 2. **Configure Web Servers**
+
 ```bash
 # Deploy complete web server setup
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" \
   --ask-vault-pass
 ```
 
 3. **Configure Job Servers**
+
 ```bash
 # Deploy job server environment
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=job" \
   --ask-vault-pass
 ```
 
 4. **Configure Database Servers**
+
 ```bash
 # Deploy database server dependencies
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=db" \
   --ask-vault-pass
 ```
@@ -378,31 +382,34 @@ ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
 ### **Advanced Usage**
 
 **Target Specific Servers:**
+
 ```bash
 # Target only web servers
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -l "web" -e "server_type=web" --ask-vault-pass
 
 # Target specific server
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -l "web-server-01" -e "server_type=web" --ask-vault-pass
 ```
 
 **Selective Component Installation:**
+
 ```bash
 # Install only dependencies
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" --tags "dependencies" --ask-vault-pass
 
 # Skip SSL certificate installation
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" --skip-tags "ssl" --ask-vault-pass
 ```
 
 **Dry Run (Check Mode):**
+
 ```bash
 # Preview changes without applying
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" --check --ask-vault-pass
 ```
 
@@ -411,7 +418,7 @@ ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
 ```
 ansible-windows-azure-automation/
 ├── 📄 ansible.cfg                    # Ansible configuration
-├── 📄 Az-Win22-Win-playbook.yml      # Main playbook
+├── 📄 playbook.yml                   # Main playbook
 ├── 📄 README.md                      # This file
 ├── 📄 SECURITY_CHECKLIST.md          # Security guidelines
 ├── 📄 .gitignore                     # Git ignore rules
@@ -593,10 +600,10 @@ az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET --tenant $TENANT_ID
 **Solutions:**
 ```bash
 # Run with increased verbosity
-ansible-playbook -vvv -i inventory/hosts.ini Az-Win22-Win-playbook.yml
+ansible-playbook -vvv -i inventory/hosts.ini playbook.yml
 
 # Test individual software installation
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   --tags "dependencies" --limit "web-server-01"
 ```
 
@@ -607,11 +614,11 @@ ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
 ansible-inventory -i inventory/hosts.ini --list
 
 # Test Azure connectivity
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   --tags "validate" --check
 
 # Verbose playbook execution
-ansible-playbook -vvv -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -vvv -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" --ask-vault-pass
 ```
 
@@ -962,7 +969,7 @@ ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
 
 ### Verbose Output
 ```bash
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" \
   -vvv
 ```
@@ -1005,7 +1012,7 @@ pip install pywinrm requests
 ansible all -i inventory/hosts.ini -m win_ping
 
 # Check Azure authentication
-ansible-playbook -i inventory/hosts.ini Az-Win22-Win-playbook.yml \
+ansible-playbook -i inventory/hosts.ini playbook.yml \
   -e "server_type=web" \
   --tags "dependencies" \
   -vvv
